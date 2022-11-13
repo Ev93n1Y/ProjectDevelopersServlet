@@ -17,14 +17,14 @@
             <input type="number" id="id" name="id" min="1" required style="margin-left: 84px;"/><br>
             <label > name: </label>
             <input type = "text" id = "name" name = "name" required style="margin-left: 59px;"/><br>
-            <label> company_id: </label>
-            <input type = "number" id = "company_id" name = "company id" required  style="margin-left: 14px;"/><br>
-            <label > customer_id: </label>
-            <input type = "number" id = "customer_id" name = "customer id" required  style="margin-left: 10px;"/><br>
+            <label> company id: </label>
+            <input type = "number" id = "company id" name = "company id" min="1" required  style="margin-left: 14px;"/><br>
+            <label > customer id: </label>
+            <input type = "number" id = "customer id" name = "customer id" min="1" required  style="margin-left: 10px;"/><br>
             <label > cost: </label>
-            <input type = "number" id = "cost" name = "cost" required  style="margin-left: 67px;"/><br>
-            <label> creation_date: </label>
-            <input type = "date" id = "creation_date" name = "creation_date" required style="width:152px"/>
+            <input type = "number" id = "cost" name = "cost" min="0" required  style="margin-left: 67px;"/><br>
+            <label> creation date: </label>
+            <input type = "date" id = "creation date" name = "creation date" required style="width:152px"/>
             <input type = "submit" name = "method" value = "update"><br><br>
             <c:if test="${not empty message}">
                 <p style="color:red">${message}</p>

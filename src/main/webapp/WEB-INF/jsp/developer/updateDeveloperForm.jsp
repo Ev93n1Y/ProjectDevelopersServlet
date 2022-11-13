@@ -19,14 +19,14 @@
             <label > name: </label>
             <input type = "text" id = "name" name = "name" required style="margin-left: 13px;"/><br>
             <label> age: </label>
-            <input type = "number" id = "age" name = "age" required  style="margin-left: 25px;"/><br>
+            <input type = "number" id = "age" name = "age" min="0" required  style="margin-left: 25px;"/><br>
             <label > gender: </label>
             <select name="gender" style="width:152px">
                 <option value="male">male</option>
                 <option value="female">female</option>
             </select><br>
             <label> salary: </label>
-            <input type = "number" id = "salary" name = "salary" required  style="margin-left: 10px;"/>
+            <input type = "number" id = "salary" name = "salary" min="0" required  style="margin-left: 10px;"/>
             <input type = "submit" name = "method" value = "update"><br><br>
             <c:if test="${not empty message}">
                 <p style="color:red">${message}</p>

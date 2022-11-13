@@ -1,11 +1,13 @@
 package service;
 
 import entities.dao.DeveloperDao;
+import entities.dao.ProjectDao;
 import entities.dto.DeveloperDto;
+import entities.dto.ProjectDto;
 import repository.DeveloperRepository;
 import service.converter.DeveloperConverter;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeveloperService implements Crud<DeveloperDto> {
@@ -24,15 +26,23 @@ public class DeveloperService implements Crud<DeveloperDto> {
     }
 
     @Override
-    public DeveloperDto read(Integer id) {
-        DeveloperDao dao = repository.selectById(id);
-        return converter.from(dao);
+    public List<DeveloperDto> read(Integer id) {
+        List<DeveloperDao> daoList = repository.selectById(id);
+        List<DeveloperDto> dtoList = new ArrayList<>();
+        for(DeveloperDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
-    public DeveloperDto read(String name) {
-        DeveloperDao dao = repository.selectByName(name);
-        return converter.from(dao);
+    public List<DeveloperDto> read(String name) {
+        List<DeveloperDao> daoList = repository.selectByDepartment(name);
+        List<DeveloperDto> dtoList = new ArrayList<>();
+        for(DeveloperDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
@@ -42,7 +52,7 @@ public class DeveloperService implements Crud<DeveloperDto> {
     }
 
     @Override
-    public void delete(Integer id) throws SQLException {
+    public void delete(Integer id) {
         repository.deleteById(id);
     }
 
@@ -50,15 +60,30 @@ public class DeveloperService implements Crud<DeveloperDto> {
         return repository.selectTotalSalaryByProjectId(id);
     }
 
-    public List<DeveloperDao> allDevelopersByProject(Integer id) {
-        return repository.selectAllDevelopersByProjectId(id);
+    public List<DeveloperDto> allDevelopersByProject(Integer id) {
+        List<DeveloperDao> daoList = repository.selectAllDevelopersByProject(id);
+        List<DeveloperDto> dtoList = new ArrayList<>();
+        for(DeveloperDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
-    public StringBuilder allJavaDevelopers() {
-        return repository.selectAllJavaDevelopers();
+    public List<DeveloperDto> allJavaDevelopers() {
+        List<DeveloperDao> daoList = repository.selectAllJavaDevelopers();
+        List<DeveloperDto> dtoList = new ArrayList<>();
+        for(DeveloperDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
-    public StringBuilder allMiddleDevelopers() {
-        return repository.selectAllMiddleDevelopers();
+    public List<DeveloperDto> allMiddleDevelopers() {
+        List<DeveloperDao> daoList = repository.selectAllMiddleDevelopers();
+        List<DeveloperDto> dtoList = new ArrayList<>();
+        for(DeveloperDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 }

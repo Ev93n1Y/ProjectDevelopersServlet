@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <c:import url="${contextPath}/WEB-INF/jsp/developer/findDeveloperForm.jsp"/>
+        <c:import url="${contextPath}/WEB-INF/jsp/skill/findSkillForm.jsp"/>
         <table style="text-align: center" border="1" width="20%">
             <thead>
                 <c:if test="${not empty skills}">

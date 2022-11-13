@@ -4,6 +4,8 @@ import config.DatabaseManagerConnector;
 import entities.dao.ProjectDao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProjectRepository implements Repository<ProjectDao> {
     private final DatabaseManagerConnector connector;
@@ -17,9 +19,10 @@ public class ProjectRepository implements Repository<ProjectDao> {
             "name = ?, company_id = ?, customer_id = ?, cost = ?, creation_date = ? WHERE id = ?";
     private static final String DELETE_BY_ID = "DELETE FROM projects WHERE id = ?";
     private static final String SELECT_PROJECTS =
-            "SELECT p.creation_date, p.name, COUNT(d_p.developer_id) FROM projects AS p " +
+            "SELECT p.id, p.name, p.company_id, p.customer_id, p.cost, p.creation_date," +
+                    " COUNT(d_p.developer_id) FROM projects AS p " +
                     "JOIN developers_projects AS d_p ON p.id = d_p.project_id " +
-                    "GROUP BY p.creation_date , p.name " +
+                    "GROUP BY p.creation_date , p.id " +
                     "ORDER BY p.creation_date";
 
 
@@ -44,40 +47,48 @@ public class ProjectRepository implements Repository<ProjectDao> {
                     dao.setId(generatedKeys.getInt(1));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Project not created");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Project not created! " + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public ProjectDao selectById(Integer id) {
+    public List<ProjectDao> selectById(Integer id) {
+        List<ProjectDao> daoList;
         ResultSet resultSet;
-        ProjectDao dao = null;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
             statement.setInt(1, id);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Project not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Project not found! " + e.getMessage());
         }
-        return dao;
     }
 
-    public ProjectDao selectByName(String name) {
+    public List<ProjectDao> selectByDepartment(String name) {
+        List<ProjectDao> daoList;
         ResultSet resultSet;
-        ProjectDao dao = null;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_NAME)) {
             statement.setString(1, name);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Project not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Project not found! " + e.getMessage());
         }
-        return dao;
     }
 
     @Override
@@ -103,50 +114,59 @@ public class ProjectRepository implements Repository<ProjectDao> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Project not updated! " + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public void deleteById(Integer id) throws SQLException {
-        Connection connection = connector.getConnection();
-        PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID);
-        statement.setInt(1, id);
-        statement.executeUpdate();
+    public void deleteById(Integer id) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Project not deleted! " + e.getMessage());
+        }
     }
 
-    public StringBuilder selectAllProjects() {
-        StringBuilder stringBuilder = new StringBuilder("All projects: \n");
+    public List<ProjectDao> selectAllProjects() {
+        List<ProjectDao> daoList = new ArrayList<>();
         ResultSet resultSet;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_PROJECTS)) {
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                stringBuilder.append("Creation Date: ");
-                stringBuilder.append(resultSet.getDate(1));
-                stringBuilder.append(" | name: ");
-                stringBuilder.append(resultSet.getString(2));
-                stringBuilder.append(" |  amount of developers: ");
-                stringBuilder.append(resultSet.getInt(3));
-                stringBuilder.append("\n");
+                ProjectDao dao = new ProjectDao();
+                dao.setId(resultSet.getInt(1));
+                dao.setName(resultSet.getString(2));
+                dao.setCompany_id(resultSet.getInt(3));
+                dao.setCustomer_id(resultSet.getInt(4));
+                dao.setCost(resultSet.getInt(5));
+                dao.setCreation_date(resultSet.getDate(6));
+                daoList.add(dao);
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("No projects found!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
-        return stringBuilder;
+        return daoList;
     }
 
-    private ProjectDao convert(ResultSet resultSet) throws SQLException {
-        ProjectDao dao = new ProjectDao();
+    private List<ProjectDao> convert(ResultSet resultSet) throws SQLException {
+        List<ProjectDao> daoList = new ArrayList<>();
+        ProjectDao dao;
         while (resultSet.next()) {
+            dao = new ProjectDao();
             dao.setId(resultSet.getInt("id"));
             dao.setName(resultSet.getString("name"));
             dao.setCompany_id(resultSet.getInt("company_id"));
             dao.setCustomer_id(resultSet.getInt("customer_id"));
             dao.setCost(resultSet.getInt("cost"));
             dao.setCreation_date(resultSet.getDate("creation_date"));
+            daoList.add(dao);
         }
-        return dao;
+        return daoList;
     }
 }

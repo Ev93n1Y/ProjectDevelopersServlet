@@ -1,11 +1,14 @@
 package service;
 
 import entities.dao.CompanyDao;
+import entities.dao.CustomerDao;
 import entities.dto.CompanyDto;
+import entities.dto.CustomerDto;
 import repository.CompanyRepository;
 import service.converter.CompanyConverter;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompanyService implements Crud<CompanyDto> {
     private final CompanyRepository repository;
@@ -23,15 +26,23 @@ public class CompanyService implements Crud<CompanyDto> {
     }
 
     @Override
-    public CompanyDto read(Integer id) {
-        CompanyDao dao = repository.selectById(id);
-        return converter.from(dao);
+    public List<CompanyDto> read(Integer id) {
+        List<CompanyDao> daoList = repository.selectById(id);
+        List<CompanyDto> dtoList = new ArrayList<>();
+        for(CompanyDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
-    public CompanyDto read(String name) {
-        CompanyDao dao = repository.selectByName(name);
-        return converter.from(dao);
+    public List<CompanyDto> read(String name) {
+        List<CompanyDao> daoList = repository.selectByDepartment(name);
+        List<CompanyDto> dtoList = new ArrayList<>();
+        for(CompanyDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
@@ -41,7 +52,7 @@ public class CompanyService implements Crud<CompanyDto> {
     }
 
     @Override
-    public void delete(Integer id) throws SQLException {
+    public void delete(Integer id) {
         repository.deleteById(id);
     }
 

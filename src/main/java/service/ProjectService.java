@@ -1,11 +1,14 @@
 package service;
 
 import entities.dao.ProjectDao;
+import entities.dao.SkillDao;
 import entities.dto.ProjectDto;
+import entities.dto.SkillDto;
 import repository.ProjectRepository;
 import service.converter.ProjectConverter;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProjectService implements Crud<ProjectDto> {
     private final ProjectRepository repository;
@@ -23,15 +26,23 @@ public class ProjectService implements Crud<ProjectDto> {
     }
 
     @Override
-    public ProjectDto read(Integer id) {
-        ProjectDao dao = repository.selectById(id);
-        return converter.from(dao);
+    public List<ProjectDto> read(Integer id) {
+        List<ProjectDao> daoList = repository.selectById(id);
+        List<ProjectDto> dtoList = new ArrayList<>();
+        for(ProjectDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
-    public ProjectDto read(String name) {
-        ProjectDao dao = repository.selectByName(name);
-        return converter.from(dao);
+    public List<ProjectDto> read(String name) {
+        List<ProjectDao> daoList = repository.selectByDepartment(name);
+        List<ProjectDto> dtoList = new ArrayList<>();
+        for(ProjectDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
@@ -41,11 +52,16 @@ public class ProjectService implements Crud<ProjectDto> {
     }
 
     @Override
-    public void delete(Integer id) throws SQLException {
+    public void delete(Integer id) {
         repository.deleteById(id);
     }
 
-    public StringBuilder AllProjects() {
-        return repository.selectAllProjects();
+    public List<ProjectDto> allProjects() {
+        List<ProjectDao> daoList = repository.selectAllProjects();
+        List<ProjectDto> dtoList = new ArrayList<>();
+        for(ProjectDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 }

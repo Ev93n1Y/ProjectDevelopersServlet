@@ -9,49 +9,36 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     </head>
     <body>
+        <c:import url="${contextPath}/WEB-INF/jsp/navigation.jsp"/>
         <h3>Calculate total developers salary at single project</h3><hr>
         <p>Enter project id</p>
         <form action="/developers">
             <label for="name">id: </label>
             <input type="number" id="id" name="id" min="1" required  style="margin-left: 24px;"/>
-            <input type = "submit" name="method" value = "salary"><br>
+            <input type = "submit" name="method" value = "salary"><br><br>
         </form>
-        <table style="text-align: center" border="1" width="20%">
-            <thead>
-                <c:if test="${not empty developers}">
+        <c:if test="${not empty salary}">
+            <table style="text-align: center" border="1" width="20%">
+                <thead>
                     <tr>
-                        <td style="text-align: center"><b>id</b></td>
-                        <td style="text-align: center"><b>name</b></td>
-                        <td style="text-align: center"><b>age</b></td>
-                        <td style="text-align: center"><b>gender</b></td>
-                        <td style="text-align: center"><b>salary</b></td>
+                        <td style="text-align: center"><b>project id</b></td>
+                        <td style="text-align: center"><b>total salary</b></td>
                     </tr>
-                </c:if>
-                <c:if test="${empty developers}">
-                    <p style="color:red">${message}</p>
-                </c:if>
-            </thead>
-                <tbody>
-                    <c:forEach var = "developer" items="${developers}">
+                    <c:if test="${empty salary}">
+                        <p style="color:red">${message}</p>
+                    </c:if>
+                </thead>
+                    <tbody>
                         <tr>
                             <td style="text-align: center">
-                                <c:out value="${developer.id}"/>
+                                <c:out value="${id}"/>
                             </td>
                             <td style="text-align: center">
-                                <c:out value="${developer.name}"/>
-                            </td>
-                            <td style="text-align: center">
-                                <c:out value="${developer.age}"/>
-                            </td>
-                            <td style="text-align: center">
-                                <c:out value="${developer.gender}"/>
-                            </td>
-                            <td style="text-align: center">
-                                <c:out value="${developer.salary}"/>
+                                <c:out value="${salary}"/>
                             </td>
                         </tr>
-                    </c:forEach>
-                </tbody>
-        </table>
+                    </tbody>
+            </table>
+        </c:if>
     </body>
 </html>

@@ -15,8 +15,6 @@
             <p> Enter skill id that you want to update </p>
             <label> id: </label>
             <input type="number" id="id" name="id" min="1" required style="margin-left: 67px;"/><br>
-            <label > name: </label>
-            <input type = "text" id = "name" name = "name" required style="margin-left: 42px"/><br>
             <label > department: </label>
             <select name="department" style="width:152px">
                 <option value="Java">java</option>

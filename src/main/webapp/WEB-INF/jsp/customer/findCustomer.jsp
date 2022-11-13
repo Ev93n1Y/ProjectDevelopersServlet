@@ -5,34 +5,35 @@
 <html>
     <body>
         <c:import url="${contextPath}/WEB-INF/jsp/customer/findCustomerForm.jsp"/>
-        <table style="text-align: center" border="1" width="20%">
-            <thead>
-                <c:if test="${not empty customers}">
-                    <tr>
-                        <td style="text-align: center"><b>id</b></td>
-                        <td style="text-align: center"><b>name</b></td>
-                        <td style="text-align: center"><b>email</b></td>
-                    </tr>
-                </c:if>
-                <c:if test="${empty customers}">
-                    <p style="color:red">${message}</p>
-                </c:if>
-            </thead>
-                <tbody>
-                    <c:forEach var = "customer" items="${customers}">
+        <c:if test="${not empty customers}">
+            <table style="text-align: center" border="1" width="20%">
+                <thead>
+
                         <tr>
-                            <td style="text-align: center">
-                                <c:out value="${customer.id}"/>
-                            </td>
-                            <td style="text-align: center">
-                                <c:out value="${customer.name}"/>
-                            </td>
-                            <td style="text-align: center">
-                                <c:out value="${customer.email}"/>
-                            </td>
+                            <td style="text-align: center"><b>id</b></td>
+                            <td style="text-align: center"><b>name</b></td>
+                            <td style="text-align: center"><b>email</b></td>
                         </tr>
-                    </c:forEach>
-                </tbody>
-        </table>
+                </thead>
+                    <tbody>
+                        <c:forEach var = "customer" items="${customers}">
+                            <tr>
+                                <td style="text-align: center">
+                                    <c:out value="${customer.id}"/>
+                                </td>
+                                <td style="text-align: center">
+                                    <c:out value="${customer.name}"/>
+                                </td>
+                                <td style="text-align: center">
+                                    <c:out value="${customer.email}"/>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+            </table>
+        </c:if>
+        <c:if test="${empty customers}">
+            <p style="color:red">${message}</p>
+        </c:if>
     </body>
 </html>

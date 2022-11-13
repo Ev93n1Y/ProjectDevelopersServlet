@@ -12,8 +12,6 @@
      <c:import url="${contextPath}/WEB-INF/jsp/navigation.jsp"/>
      <h3> Add new skill </h3><hr>
         <form action = "/skills" method = "post">
-            <label > name: </label>
-            <input type = "text" id = "name" name = "name" required style="margin-left: 42px"/><br>
             <label > department: </label>
             <select name="department" style="width:152px">
                 <option value="Java">java</option>
@@ -27,7 +25,7 @@
                 <option value="Middle">middle</option>
                 <option value="Senior">senior</option>
             </select>
-            <input type = "submit" name = "method" value = "update"><br><br>
+            <input type = "submit" name = "method" value = "create"><br><br>
             <c:if test="${not empty message}">
                 <p style="color:red">${message}</p>
             </c:if>

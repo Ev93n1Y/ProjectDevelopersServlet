@@ -2,7 +2,6 @@ package controller.skill;
 
 import config.DatabaseManagerConnector;
 import config.PropertiesConfig;
-import entities.dto.DeveloperDto;
 import entities.dto.SkillDto;
 import repository.SkillRepository;
 import service.SkillService;
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -22,10 +20,11 @@ import java.util.Properties;
 @WebServlet(urlPatterns = "/skills")
 public class SkillController extends HttpServlet {
     private SkillService service;
-    private static final String DELETE_URL = "/WEB-INF/jsp/skill/deleteSkillForm.jsp";
-    private static final String CREATE_URL = "/WEB-INF/jsp/skill/createSkillForm.jsp";
-    private static final String UPDATE_URL = "/WEB-INF/jsp/skill/updateSkillForm.jsp";
-    private static final String FIND_URL = "/WEB-INF/jsp/skill/findSkill.jsp";
+    private static final String SKILL = "/WEB-INF/jsp/skill/";
+    private static final String DELETE_URL = SKILL + "deleteSkillForm.jsp";
+    private static final String CREATE_URL = SKILL + "createSkillForm.jsp";
+    private static final String UPDATE_URL = SKILL + "updateSkillForm.jsp";
+    private static final String FIND_URL = SKILL + "findSkill.jsp";
     @Override
     public void init() {
         String dbPassword = System.getenv("dbPassword");
@@ -42,95 +41,91 @@ public class SkillController extends HttpServlet {
         switch (req.getParameter("method")){
             case "find id":
                 findById(req);
+                req.getRequestDispatcher(FIND_URL).forward(req, resp);
                 break;
-            case "find name":
-                findByName(req);
+            case "find department":
+                findByDepartment(req);
+                req.getRequestDispatcher(FIND_URL).forward(req, resp);
                 break;
         }
-        req.getRequestDispatcher(FIND_URL).forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         switch (req.getParameter("method")) {
             case "create":
-                create(req, resp);
+                create(req);
+                req.getRequestDispatcher(CREATE_URL).forward(req, resp);
                 break;
             case "update":
-                update(req, resp);
+                update(req);
+                req.getRequestDispatcher(UPDATE_URL).forward(req, resp);
                 break;
             case "delete":
                 doDelete(req, resp);
+                req.getRequestDispatcher(DELETE_URL).forward(req, resp);
                 break;
         }
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         Integer id = Integer.valueOf(req.getParameter("id"));
-        if(service.read(id).isNull()){
-            req.setAttribute("message", "There is no skill by specified id");
-        } else {
-            try {
-                service.delete(id);
-                req.setAttribute("message", String.format("Skill with id %d successfully deleted!", id));
-            } catch (SQLException e) {
-                req.setAttribute("message", e.getMessage());
-            }
+        try {
+            service.read(id);
+            service.delete(id);
+            req.setAttribute("message", String.format("Skill with id %d successfully deleted!", id));
+        } catch (RuntimeException e) {
+            req.setAttribute("message", e.getMessage());
         }
-        req.getRequestDispatcher(DELETE_URL).forward(req, resp);
     }
 
-    private void update(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void update(HttpServletRequest req) {
         SkillDto dto = new SkillDto();
+        dto.setId(Integer.parseInt(req.getParameter("id")));
         dto.setDepartment(req.getParameter("department"));
         dto.setLevel(req.getParameter("level"));
-        if(service.read(dto.getId()).isNull()){
-            req.setAttribute("message", "There is no skills by specified id");
-        } else {
+        try {
+            service.read(dto.getId());
             dto = service.update(dto.getId(), dto);
             req.setAttribute("message",
                     String.format("Skill with id %d successfully updated", dto.getId()));
+        } catch (RuntimeException e) {
+            req.setAttribute("message", e.getMessage());
         }
-        req.getRequestDispatcher(UPDATE_URL).forward(req, resp);
     }
 
-    private void create(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void create(HttpServletRequest req) {
         SkillDto dto = new SkillDto();
         dto.setDepartment(req.getParameter("department"));
         dto.setLevel(req.getParameter("level"));
-        dto = service.create(dto);
-        if (!dto.isNull()) {
+        try {
+            dto = service.create(dto);
             req.setAttribute("message",
                     String.format("Skill %s %s created with id %d", dto.getDepartment(), dto.getLevel(), dto.getId()));
-        } else {
-            req.setAttribute("message", "Skill not created");
+        } catch (RuntimeException e) {
+            req.setAttribute("message", e.getMessage());
         }
-        req.getRequestDispatcher(CREATE_URL).forward(req, resp);
     }
 
-    private void findByName(HttpServletRequest req) {
-        List<SkillDto> dtoList = new ArrayList<>();
-        SkillDto dto;
-        String name = req.getParameter("name");
-        dto = service.read(name);
-        if (dto.isNull()) {
-            req.setAttribute("message", "There is no skills by specified name");
-        } else {
-            dtoList.add(dto);
+    private void findByDepartment(HttpServletRequest req) {
+        List<SkillDto> dtoList;
+        String department = req.getParameter("department");
+        try {
+            dtoList = service.read(department);
             req.setAttribute("skills", dtoList);
+        } catch (RuntimeException e) {
+            req.setAttribute("message", e.getMessage());
         }
     }
     private void findById(HttpServletRequest req){
-        List<SkillDto> dtoList = new ArrayList<>();
-        SkillDto dto;
+        List<SkillDto> dtoList;
         int id = Integer.parseInt(req.getParameter("id"));
-        dto = service.read(id);
-        if (dto.isNull()) {
-            req.setAttribute("message", "There is no skills by specified id");
-        } else {
-            dtoList.add(dto);
+        try {
+            dtoList = service.read(id);
             req.setAttribute("skills", dtoList);
+        } catch (RuntimeException e) {
+            req.setAttribute("message", e.getMessage());
         }
     }
 }

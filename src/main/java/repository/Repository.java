@@ -1,16 +1,15 @@
 package repository;
 
-import java.sql.SQLException;
-import java.util.Optional;
+import java.util.List;
 
 public interface Repository<T> {
     T save(T entity);
 
-    T selectById(Integer id);
+    List<T> selectById(Integer id);
 
-    T selectByName(String name);
+    List<T> selectByDepartment(String name);
 
     T updateById(Integer id, T t);
 
-    void deleteById(Integer id) throws SQLException;
+    void deleteById(Integer id);
 }

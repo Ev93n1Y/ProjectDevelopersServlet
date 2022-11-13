@@ -13,13 +13,13 @@
      <h3>Find skill</h3><hr>
         <form action="/skills">
             <label for="name">id: </label>
-            <input type="number" id="id" name="id" min="1" required  style="margin-left: 24px;"/>
+            <input type="number" id="id" name="id" min="1" required  style="margin-left: 68px;"/>
             <input type = "submit" name="method" value = "find id"><br>
         </form>
         <form action="/skills">
-            <label for="name">name: </label>
-            <input type="text" id="name" name="name" required/>
-            <input type = "submit" name="method" value = "find name"><br><br>
+            <label for="name">department: </label>
+            <input type="text" id="department" name="department" required/>
+            <input type = "submit" name="method" value = "find department"><br><br>
         </form>
     </body>
 </html>

@@ -4,12 +4,14 @@ import config.DatabaseManagerConnector;
 import entities.dao.SkillDao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SkillRepository implements Repository<SkillDao> {
     private final DatabaseManagerConnector connector;
     private static final String INSERT = "INSERT INTO skills (department, level) VALUES (?,?)";
     private static final String SELECT_BY_ID = "SELECT id, department, level FROM skills WHERE id = ?";
-    private static final String SELECT_BY_NAME = "SELECT id, department, level FROM skills WHERE department = ?";
+    private static final String SELECT_BY_DEP = "SELECT id, department, level FROM skills WHERE department = ?";
     private static final String UPDATE_BY_ID = "UPDATE skills SET  department = ?, level = ? WHERE id = ?";
     private static final String DELETE_BY_ID = "DELETE FROM skills WHERE id = ?";
 
@@ -29,40 +31,48 @@ public class SkillRepository implements Repository<SkillDao> {
                     dao.setId(generatedKeys.getInt(1));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Skill not created");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Skill not created! " + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public SkillDao selectById(Integer id) {
+    public List<SkillDao> selectById(Integer id) {
+        List<SkillDao> daoList;
         ResultSet resultSet;
-        SkillDao dao = null;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
             statement.setInt(1, id);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Skill not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Skill not found! " + e.getMessage());
         }
-        return dao;
     }
 
-    public SkillDao selectByName(String name) {
+    public List<SkillDao> selectByDepartment(String department) {
+        List<SkillDao> daoList;
         ResultSet resultSet;
-        SkillDao dao = null;
         try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_BY_NAME)) {
-            statement.setString(1, name);
+             PreparedStatement statement = connection.prepareStatement(SELECT_BY_DEP)) {
+            statement.setObject(1, department, Types.OTHER);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Skill not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Skill not found! " + e.getMessage());
         }
-        return dao;
     }
 
     @Override
@@ -82,25 +92,33 @@ public class SkillRepository implements Repository<SkillDao> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Skill not updated! " + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public void deleteById(Integer id) throws SQLException {
-        Connection connection = connector.getConnection();
-        PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID);
-        statement.setInt(1, id);
-        statement.executeUpdate();
+    public void deleteById(Integer id) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Skill not deleted! " + e.getMessage());
+        }
     }
 
-    private SkillDao convert(ResultSet resultSet) throws SQLException {
-        SkillDao skillDao = new SkillDao();
+    private List<SkillDao> convert(ResultSet resultSet) throws SQLException {
+        List<SkillDao> daoList = new ArrayList<>();
+        SkillDao skillDao;
         while (resultSet.next()) {
+            skillDao = new SkillDao();
             skillDao.setId(resultSet.getInt("id"));
             skillDao.setDepartment(resultSet.getString("department"));
             skillDao.setLevel(resultSet.getString("level"));
+            daoList.add(skillDao);
         }
-        return skillDao;
+        return daoList;
     }
 }

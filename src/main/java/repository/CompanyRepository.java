@@ -2,10 +2,10 @@ package repository;
 
 import config.DatabaseManagerConnector;
 import entities.dao.CompanyDao;
-import lombok.SneakyThrows;
 
-import javax.servlet.ServletException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompanyRepository implements Repository<CompanyDao> {
     private final DatabaseManagerConnector connector;
@@ -30,41 +30,48 @@ public class CompanyRepository implements Repository<CompanyDao> {
             if (generatedKeys.next()) {
                 dao.setId(generatedKeys.getInt(1));
             }
-        } catch (SQLException ex){
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Company not created! " + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public CompanyDao selectById(Integer id) {
+    public List<CompanyDao> selectById(Integer id) {
+        List<CompanyDao> daoList;
         ResultSet resultSet;
-        CompanyDao dao;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
             statement.setInt(1, id);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
-            return dao;
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Company not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
-        return null;
     }
 
-    public CompanyDao selectByName(String name) {
+    public List<CompanyDao> selectByDepartment(String name) {
+        List<CompanyDao> daoList;
         ResultSet resultSet;
-        CompanyDao dao;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_NAME)) {
             statement.setString(1, name);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
-            return dao;
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Company not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
-        return null;
     }
 
     @Override
@@ -84,26 +91,33 @@ public class CompanyRepository implements Repository<CompanyDao> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Company not updated! " + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public void deleteById(Integer id) throws SQLException {
-        Connection connection = connector.getConnection();
-        PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID);
-        statement.setInt(1, id);
-        statement.executeUpdate();
-
+    public void deleteById(Integer id) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Company not deleted! " + e.getMessage());
+        }
     }
 
-    private CompanyDao convert(ResultSet resultSet) throws SQLException {
-        CompanyDao companyDao = new CompanyDao();
+    private List<CompanyDao> convert(ResultSet resultSet) throws SQLException {
+        List<CompanyDao> daoList = new ArrayList<>();
+        CompanyDao dao;
         while (resultSet.next()) {
-            companyDao.setId(resultSet.getInt("id"));
-            companyDao.setName(resultSet.getString("name"));
-            companyDao.setLocation(resultSet.getString("location"));
+            dao =  new CompanyDao();
+            dao.setId(resultSet.getInt("id"));
+            dao.setName(resultSet.getString("name"));
+            dao.setLocation(resultSet.getString("location"));
+            daoList.add(dao);
         }
-        return companyDao;
+        return daoList;
     }
 }

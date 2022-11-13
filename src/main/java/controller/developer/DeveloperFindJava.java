@@ -7,10 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(urlPatterns = "/developers/project devs")
-public class DevelopersOnProject extends HttpServlet {
+@WebServlet(urlPatterns = "/developers/java devs")
+public class DeveloperFindJava extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/WEB-INF/jsp/developer/findDevelopersOnProject.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/jsp/developer/findJavaDevelopers.jsp").forward(req, resp);
     }
 }

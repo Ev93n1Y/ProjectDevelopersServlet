@@ -4,6 +4,8 @@ import config.DatabaseManagerConnector;
 import entities.dao.CustomerDao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomerRepository implements Repository<CustomerDao> {
     private final DatabaseManagerConnector connector;
@@ -29,40 +31,48 @@ public class CustomerRepository implements Repository<CustomerDao> {
                     dao.setId(generatedKeys.getInt(1));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Customer not created");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Customer not created! " + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public CustomerDao selectById(Integer id) {
+    public List<CustomerDao> selectById(Integer id) {
+        List<CustomerDao> daoList;
         ResultSet resultSet;
-        CustomerDao dao = null;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
             statement.setInt(1, id);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Customer not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Customer not found! " + e.getMessage());
         }
-        return dao;
     }
 
-    public CustomerDao selectByName(String name) {
+    public List<CustomerDao> selectByDepartment(String name) {
+        List<CustomerDao> daoList;
         ResultSet resultSet;
-        CustomerDao dao = null;
         try (Connection connection = connector.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_NAME)) {
             statement.setString(1, name);
             resultSet = statement.executeQuery();
-            dao = convert(resultSet);
+            daoList = convert(resultSet);
+            if(daoList.isEmpty()){
+                throw new RuntimeException("Customer not found! ");
+            }
+            return daoList;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Customer not found" + e.getMessage());
         }
-        return dao;
     }
 
     @Override
@@ -82,26 +92,33 @@ public class CustomerRepository implements Repository<CustomerDao> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Customer not updated" + e.getMessage());
         }
         return dao;
     }
 
     @Override
-    public void deleteById(Integer id) throws SQLException {
-        Connection connection = connector.getConnection();
-        PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID);
-        statement.setInt(1, id);
-        statement.executeUpdate();
-
+    public void deleteById(Integer id) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Customer not deleted!" + e.getMessage());
+        }
     }
 
-    private CustomerDao convert(ResultSet resultSet) throws SQLException {
-        CustomerDao customerDao = new CustomerDao();
+    private List<CustomerDao> convert(ResultSet resultSet) throws SQLException {
+        List<CustomerDao> daoList = new ArrayList<>();
+        CustomerDao dao;
         while (resultSet.next()) {
-            customerDao.setId(resultSet.getInt("id"));
-            customerDao.setName(resultSet.getString("name"));
-            customerDao.setEmail(resultSet.getString("email"));
+            dao = new CustomerDao();
+            dao.setId(resultSet.getInt("id"));
+            dao.setName(resultSet.getString("name"));
+            dao.setEmail(resultSet.getString("email"));
+            daoList.add(dao);
         }
-        return customerDao;
+        return daoList;
     }
 }

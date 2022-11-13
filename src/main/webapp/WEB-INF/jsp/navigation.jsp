@@ -26,10 +26,9 @@
                     <li><a href="/developers/delete">Delete developer</a></li>
                     <li><a href="/developers/find">Find developer</a></li>
                     <li><a href="/developers/update">Update developer</a></li>
-                    <li><a href="/developers/project devs">Find all developers by project</a></li>
-                    <li><a href="/developers/4">Find all Java developers</a></li>
-                    <li><a href="/developers/4">Find all middle developers</a></li>
-                    <li><a href="/developers/4">Find all projects</a></li>
+                    <li><a href="/developers/project devs">Find all developers on project</a></li>
+                    <li><a href="/developers/java devs">Find all Java developers</a></li>
+                    <li><a href="/developers/middle devs">Find all middle developers</a></li>
                     <li><a href="/developers/salary">Total developers salary at single project</a></li>
                 </ul>
             </li>
@@ -38,6 +37,7 @@
                     <li><a href="/projects/create">Add project</a></li>
                     <li><a href="/projects/delete">Delete project</a></li>
                     <li><a href="/projects/find">Find project</a></li>
+                    <li><a href="/projects/find all">Find all projects</a></li>
                     <li><a href="/projects/update">Update project</a></li>
                 </ul>
             </li>

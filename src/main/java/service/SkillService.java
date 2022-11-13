@@ -1,11 +1,14 @@
 package service;
 
+import entities.dao.DeveloperDao;
 import entities.dao.SkillDao;
+import entities.dto.DeveloperDto;
 import entities.dto.SkillDto;
 import repository.SkillRepository;
 import service.converter.SkillConverter;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SkillService implements Crud<SkillDto> {
     private final SkillRepository repository;
@@ -23,15 +26,23 @@ public class SkillService implements Crud<SkillDto> {
     }
 
     @Override
-    public SkillDto read(Integer id) {
-        SkillDao dao = repository.selectById(id);
-        return converter.from(dao);
+    public List<SkillDto> read(Integer id) {
+        List<SkillDao> daoList = repository.selectById(id);
+        List<SkillDto> dtoList = new ArrayList<>();
+        for(SkillDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
-    public SkillDto read(String name) {
-        SkillDao dao = repository.selectByName(name);
-        return converter.from(dao);
+    public List<SkillDto> read(String department) {
+        List<SkillDao> daoList = repository.selectByDepartment(department);
+        List<SkillDto> dtoList = new ArrayList<>();
+        for(SkillDao dao:daoList){
+            dtoList.add(converter.from(dao));
+        }
+        return dtoList;
     }
 
     @Override
@@ -41,7 +52,7 @@ public class SkillService implements Crud<SkillDto> {
     }
 
     @Override
-    public void delete(Integer id) throws SQLException {
+    public void delete(Integer id) {
         repository.deleteById(id);
     }
 }

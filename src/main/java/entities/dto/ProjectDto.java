@@ -15,9 +15,4 @@ public class ProjectDto {
     private Integer customer_id;
     private Integer cost;
     private Date creation_date;
-
-    public boolean isNull(){
-        return id == null && name == null && company_id == null
-                && customer_id == null && cost == null && creation_date == null;
-    }
 }
